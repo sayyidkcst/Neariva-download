@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0759c7">
+  <meta name="description" content="Neariva - Everything Nearby. Discover shops, hospitals, pharmacies, transport, restaurants and emergency services near you.">
+  <title>Neariva - Everything Nearby</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f8ff;
+      color: #17243b;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #064db3, #078cbd);
+      color: white;
+      padding: 22px 7%;
+    }
+
+    nav {
+      max-width: 1150px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .brand span {
+      color: #ffbd45;
+    }
+
+    .nav-tagline {
+      font-size: 13px;
+      opacity: .9;
+    }
+
+    .hero {
+      max-width: 1150px;
+      margin: auto;
+      padding: 75px 20px 85px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      align-items: center;
+      gap: 45px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 5vw, 62px);
+      line-height: 1.12;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: #ffbd45;
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 550px;
+      opacity: .95;
+      margin-bottom: 28px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      background: #ffbd45;
+      color: #17345b;
+      padding: 15px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 7px 20px #003d7733;
+      transition: .2s;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      background: #ffd071;
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ---- Mobile app screen mockup ---- */
+    .app-screen {
+      width: 280px;
+      height: 560px;
+      background: #eef4f0;
+      border: 10px solid #182b48;
+      border-radius: 38px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px #00335b55;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-screen::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 75px;
+      height: 15px;
+      background: #182b48;
+      border-radius: 10px;
+      z-index: 10;
+    }
+
+    /* Status bar */
+    .status-bar {
+      background: #6b2fd6;
+      padding: 20px 16px 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #fff;
+    }
+
+    /* Purple header */
+    .app-header {
+      background: linear-gradient(160deg, #7c3aed, #5b21b6);
+      padding: 6px 16px 18px;
+      border-radius: 0 0 22px 22px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .app-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .location-block {
+      font-size: 9px;
+    }
+
+    .location-block .nearby {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .location-block .nearby::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #ff4d6d;
+      border-radius: 50%;
+    }
+
+    .location-block .sub {
+      font-size: 9px;
+      opacity: .9;
+      margin-top: 2px;
+      padding-left: 11px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .circle-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #fff;
+    }
+
+    .search-bar {
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #8a8f9c;
+      font-size: 11px;
+    }
+
+    .search-bar .ico {
+      font-size: 14px;
+      color: #6b2fd6;
+    }
+
+    /* Scrollable list */
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 12px 70px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .app-body::-webkit-scrollbar { display: none; }
+
+    /* Card */
+    .app-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 10px;
+      box-shadow: 0 4px 14px rgba(30,50,90,.08);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 95px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #dbe7f5 0%, #c9dcf0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-img.kcst {
+      background: linear-gradient(135deg, #2a3b4d 0%, #3d5468 100%);
+    }
+
+    .kcst-logo {
+      text-align: center;
+      color: #fff;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .kcst-logo .k { font-size: 26px; }
+    .kcst-logo .k span { color: #4ea8f5; }
+    .kcst-logo .n { font-size: 9px; font-weight: 600; letter-spacing: .4px; }
+
+    .card-row {
+      display: flex;
+      gap: 9px;
+      margin-top: 9px;
+      align-items: flex-start;
+    }
+
+    .card-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #f2ecff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+
+    .card-info { flex: 1; min-width: 0; }
+
+    .card-info h4 {
+      font-size: 12px;
+      font-weight: 800;
+      color: #17243b;
+      margin-bottom: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-info .addr {
+      font-size: 9px;
+      color: #7a8496;
+      margin-bottom: 3px;
+    }
+
+    .meta-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      color: #4a5568;
+      margin-bottom: 1px;
+    }
+
+    .meta-line .m-ico { font-size: 10px; color: #6b2fd6; }
+
+    .added-by {
+      font-size: 8.5px;
+      color: #8a94a6;
+      margin-top: 3px;
+    }
+
+    .added-by strong { color: #4a5568; font-weight: 700; }
+
+    .distance-badge {
+      background: #f2ecff;
+      color: #6b2fd6;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Action buttons */
+    .card-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .action-btn {
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .action-btn.purple { background: #6b2fd6; color: #fff; }
+    .action-btn.lav { background: #f2ecff; color: #6b2fd6; }
+    .action-btn.green { background: #16b364; color: #fff; }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid #eef1f6;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      padding: 7px 4px 10px;
+      z-index: 5;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 7.5px;
+      color: #8a94a6;
+      flex: 1;
+    }
+
+    .nav-item .n-ico {
+      font-size: 15px;
+      color: #8a94a6;
+    }
+
+    .nav-item.active { color: #6b2fd6; }
+    .nav-item.active .n-ico { color: #6b2fd6; }
+
+    .nav-item .avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd071, #e8a13a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .fab {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #6b2fd6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 6px 16px #6b2fd655;
+      margin-top: -18px;
+      border: 3px solid #fff;
+    }
+
+    /* ---- Rest of page ---- */
+    .section {
+      max-width: 1150px;
+      margin: auto;
+      padding: 65px 20px;
+      text-align: center;
+    }
+
+    .section h2 {
+      font-size: 32px;
+      color: #123b73;
+      margin-bottom: 10px;
+    }
+
+    .section-intro {
+      color: #64748b;
+      margin-bottom: 35px;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .service {
+      background: white;
+      padding: 25px 12px;
+      border-radius: 17px;
+      box-shadow: 0 5px 20px #1d47700d;
+      border: 1px solid #e8eef7;
+      transition: .2s;
+    }
+
+    .service:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px #1d47701c;
+    }
+
+    .service .emoji {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    .service h3 {
+      font-size: 16px;
+      color: #173b6d;
+    }
+
+    .download-section {
+      background: white;
+      padding: 55px 20px;
+      text-align: center;
+    }
+
+    .download-section h2 {
+      font-size: 30px;
+      color: #123b73;
+      margin-bottom: 10px;
+    }
+
+    .download-section p {
+      color: #64748b;
+      margin-bottom: 22px;
+    }
+
+    .qr-card {
+      display: inline-block;
+      background: #f5f8fc;
+      padding: 20px;
+      border-radius: 16px;
+      margin: 25px auto;
+      border: 1px solid #e2eaf5;
+    }
+
+    #qrcode {
+      background: white;
+      padding: 10px;
+      min-width: 180px;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .qr-label {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #29466b;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #8793a4;
+      margin-top: 12px;
+    }
+
+    footer {
+      background: #10233f;
+      color: white;
+      padding: 40px 20px 18px;
+    }
+
+    .footer-content {
+      max-width: 1150px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .footer-brand {
+      font-size: 25px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .footer-brand span {
+      color: #ffbd45;
+    }
+
+    .footer-content p {
+      color: #c4d0df;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .footer-content a {
+      color: #ffbd45;
+      text-decoration: none;
+    }
+
+    .footer-bottom {
+      max-width: 1150px;
+      margin: 25px auto 0;
+      padding-top: 16px;
+      border-top: 1px solid #34445d;
+      text-align: center;
+      color: #aab8ca;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 55px 20px;
+      }
+
+      .hero p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .services {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand {
+        font-size: 25px;
+      }
+
+      .nav-tagline {
+        font-size: 11px;
+      }
+
+      .section h2,
+      .download-section h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <nav>
+      <div class="brand">Near<span>iva</span></div>
+      <div class="nav-tagline">Everything Nearby.</div>
+    </nav>
+
+    <div class="hero">
+      <div>
+        <h1>Discover Everything <span>Nearby.</span></h1>
+        <p>
+          Find nearby shops, hospitals, pharmacies, police stations,
+          transport services, restaurants and more — all in one place.
+        </p>
+        <a href="#download" class="download-btn">Download Neariva ↓</a>
+      </div>
+
+      <div class="hero-visual">
+        <!-- Mobile app screen mockup -->
+        <div class="app-screen">
+
+          <div class="status-bar">
+            <span>📶</span><span>🔋</span>
+          </div>
+
+          <div class="app-header">
+            <div class="app-header-top">
+              <div class="location-block">
+                <div class="nearby">NEARBY</div>
+                <div class="sub">Near Kavanoor, Malappuram · ±20 m ▾</div>
+              </div>
+              <div class="header-actions">
+                <div class="circle-btn">↻</div>
+                <div class="circle-btn">ⓘ</div>
+              </div>
+            </div>
+
+            <div class="search-bar">
+              <span class="ico">🔍</span>
+              <span>Search shops, hospitals, vehicles...</span>
+            </div>
+          </div>
+
+          <div class="app-body">
+
+            <!-- Card 1 -->
+            <div class="app-card">
+              <div class="card-img">
+                <div style="text-align:center;font-size:34px;">🏪</div>
+              </div>
+              <div class="card-row">
+                <div class="card-icon">🏪</div>
+                <div class="card-info">
+                  <h4>Local Shop</h4>
+                  <div class="addr">Main Road, Kavanoor</div>
+                  <div class="meta-line"><span class="m-ico">🕒</span> 9:00 AM – 8:00 PM</div>
+                  <div class="meta-line"><span class="m-ico">📞</span> 9446447350</div>
+                  <div class="added-by">Added by <strong>SAYYID SHEREEF KC</strong></div>
+                </div>
+                <div class="distance-badge">1.2 km</div>
+              </div>
+              <div class="card-actions">
+                <div class="action-btn purple">➤</div>
+                <div class="action-btn lav">📞</div>
+                <div class="action-btn green">💬</div>
+                <div class="action-btn lav">★</div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="app-card">
+              <div class="card-img kcst">
+                <div class="kcst-logo">
+                  <div class="k"><span>K</span>CST</div>
+                  <div class="n">Media Technology</div>
+                </div>
+              </div>
+              <div class="card-row">
+                <div class="card-icon">🛍️</div>
+                <div class="card-info">
+                  <h4>KCST Media Technology</h4>
+                  <div class="addr">vadakkummuri</div>
+                  <div class="meta-line"><span class="m-ico">🕒</span> 9:00 AM – 5:00 PM</div>
+                  <div class="meta-line"><span class="m-ico">📞</span> 9633315177</div>
+                  <div class="added-by">Added by <strong>SAYYID SHEREEF KC</strong></div>
+                </div>
+                <div class="distance-badge">5.7 km</div>
+              </div>
+              <div class="card-actions">
+                <div class="action-btn purple">➤</div>
+                <div class="action-btn lav">📞</div>
+                <div class="action-btn green">💬</div>
+                <div class="action-btn lav">★</div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="app-card">
+              <div class="card-img" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+                <div style="text-align:center;font-size:34px;">🏥</div>
+              </div>
+              <div class="card-row">
+                <div class="card-icon">🏥</div>
+                <div class="card-info">
+                  <h4>City Hospital</h4>
+                  <div class="addr">Malappuram Road</div>
+                  <div class="meta-line"><span class="m-ico">🕒</span> 24 Hours Open</div>
+                  <div class="meta-line"><span class="m-ico">📞</span> 0483 273 6000</div>
+                  <div class="added-by">Added by <strong>NEARIVA</strong></div>
+                </div>
+                <div class="distance-badge">2.1 km</div>
+              </div>
+              <div class="card-actions">
+                <div class="action-btn purple">➤</div>
+                <div class="action-btn lav">📞</div>
+                <div class="action-btn green">💬</div>
+                <div class="action-btn lav">★</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom navigation -->
+          <div class="bottom-nav">
+            <div class="nav-item active">
+              <span class="n-ico">🧭</span>
+              Explore
+            </div>
+            <div class="nav-item">
+              <span class="n-ico">📞</span>
+              SOS
+            </div>
+            <div class="nav-item">
+              <div class="fab">+</div>
+            </div>
+            <div class="nav-item">
+              <span class="n-ico">📍</span>
+              My places
+            </div>
+            <div class="nav-item">
+              <div class="avatar">S</div>
+              SAYYID
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2>Explore Nearby Services</h2>
+    <p class="section-intro">
+      Discover useful places and services around your location.
+    </p>
+
+    <div class="services">
+      <div class="service">
+        <div class="emoji">🏪</div>
+        <h3>Shops & Stores</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">🏥</div>
+        <h3>Hospitals</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">🚔</div>
+        <h3>Police Stations</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">💊</div>
+        <h3>Pharmacies</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">🚌</div>
+        <h3>Bus Services</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">🚆</div>
+        <h3>Railway Stations</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">🍽️</div>
+        <h3>Restaurants</h3>
+      </div>
+
+      <div class="service">
+        <div class="emoji">📞</div>
+        <h3>Emergency Contacts</h3>
+      </div>
+    </div>
+  </section>
+
+  <section class="download-section" id="download">
+    <h2>Get Neariva on Your Phone</h2>
+    <p>
+      Download the Android app and explore everything nearby.
+    </p>
+
+    <a href="#" id="downloadButton" class="download-btn">
+      <span>⬇</span> Download for Android
+    </a>
+
+    <div>
+      <div class="qr-card">
+        <div id="qrcode"></div>
+        <div class="qr-label">Scan to Download Neariva</div>
+      </div>
+    </div>
+
+    <p class="note" id="downloadNote">
+      Android app download link will be available soon.
+    </p>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+
+      <div>
+        <div class="footer-brand">Near<span>iva</span></div>
+        <p>Everything Nearby.</p>
+        <p>Discover • Connect • Explore</p>
+        <p>Your nearby services, all in one place.</p>
+      </div>
+
+      <div>
+        <h3>Developed & Maintained By</h3>
+        <p><strong>KCST Media Technology</strong></p>
+        <p>Vadakkummuri, Urangattiry (PO)</p>
+        <p>673639, Kerala, India</p>
+        <p>Phone:
+          <a href="tel:9633315177">9633315177</a>
+        </p>
+        <p>Digital Solutions & Mobile Applications</p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      © <span id="year"></span> KCST Media Technology.
+      All Rights Reserved. | Neariva
+    </div>
+  </footer>
+
+  <script>
+    // ======================================
+    // NEARIVA APP DOWNLOAD SETTINGS
+    // Replace this URL with your actual APK
+    // download link when it is published.
+    // ======================================
+
+    const DOWNLOAD_URL = "https://example.com/neariva.apk";
+
+    const downloadButton = document.getElementById("downloadButton");
+    const downloadNote = document.getElementById("downloadNote");
+
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    const isDownloadReady =
+      DOWNLOAD_URL !== "https://example.com/neariva.apk";
+
+    if (isDownloadReady) {
+      downloadButton.href = DOWNLOAD_URL;
+      downloadButton.setAttribute("download", "");
+      downloadNote.textContent = "Scan the QR code or tap the button to download.";
+    } else {
+      downloadButton.href = "#";
+      downloadNote.textContent =
+        "App download will be available soon. Please update the download link when your APK is ready.";
+
+      downloadButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        alert("Neariva Android app will be available soon!");
+      });
+    }
+
+    // Generate QR code using the same download URL.
+    const qrContainer = document.getElementById("qrcode");
+
+    if (typeof QRCode !== "undefined") {
+      new QRCode(qrContainer, {
+        text: DOWNLOAD_URL,
+        width: 180,
+        height: 180,
+        colorDark: "#123b73",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    } else {
+      qrContainer.textContent = "QR code unavailable";
+    }
+  </script>
+
+</body>
+</html>
